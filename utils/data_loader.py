@@ -99,7 +99,7 @@ def collate_fn(data):
     return images, questions, answers, answer_types, qindices
 
 
-def get_vae_loader(dataset, transform, batch_size, sampler=None,
+def get_loader(dataset, transform, batch_size, sampler=None,
                    shuffle=True, num_workers=1, max_examples=None,
                    indices=None):
     """Returns torch.utils.data.DataLoader for custom dataset.
@@ -119,9 +119,9 @@ def get_vae_loader(dataset, transform, batch_size, sampler=None,
     Returns:
         A torch.utils.data.DataLoader for custom engagement dataset.
     """
-    vae = IQDataset(dataset, transform=transform, max_examples=max_examples,
-                     indices=indices)
-    data_loader = torch.utils.data.DataLoader(dataset=vae,
+    iq = IQDataset(dataset, transform=transform, max_examples=max_examples,
+                    indices=indices)
+    data_loader = torch.utils.data.DataLoader(dataset=iq,
                                               batch_size=batch_size,
                                               shuffle=shuffle,
                                               sampler=sampler,
