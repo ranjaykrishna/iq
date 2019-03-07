@@ -1,0 +1,3 @@
+[submodule "utils/nlg-eval"]
+	path = utils/nlg-eval
+	url = https://github.com/Maluuba/nlg-eval
