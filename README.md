@@ -1,7 +1,5 @@
 # Information Maximizing Visual Question Generation
 
-# Referring Relationships
-
 ![IQ model](https://cs.stanford.edu/people/ranjaykrishna/iq/model.png)
 
 This repository contains code used to produce the results in the following paper:
