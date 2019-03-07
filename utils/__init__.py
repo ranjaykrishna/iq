@@ -1,4 +1,5 @@
 from .data_loader import get_loader
+from .nlg_eval.nlgeval import NLGEval
 from .train_utils import Vocabulary
 from .train_utils import gaussian_KL_loss
 from .train_utils import get_glove_embedding
