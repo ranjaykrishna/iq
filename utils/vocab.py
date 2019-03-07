@@ -124,7 +124,7 @@ if __name__ == '__main__':
                         'train2014_questions.json',
                         help='Path for train questions file.')
     parser.add_argument('--answer-types', type=str,
-                        default='data/vqa/answer_types.json',
+                        default='data/vqa/iq_dataset.json',
                         help='Path for the answer types.')
     parser.add_argument('--threshold', type=int, default=4,
                         help='Minimum word count threshold.')
