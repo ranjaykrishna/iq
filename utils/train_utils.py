@@ -46,15 +46,15 @@ class Vocabulary(object):
             self.idx += 1
 
     def remove_word(self, word):
-	"""Removes a specified word and updates the total number of unique words.
+        """Removes a specified word and updates the total number of unique words.
 
-	Args:
-	    word: String representation of the word.
-	"""
-	if word in self.word2idx:
-	    self.word2idx.pop(word)
-	    self.idx2word.pop(self.idx)
-	    self.idx -= 1
+        Args:
+            word: String representation of the word.
+        """
+        if word in self.word2idx:
+            self.word2idx.pop(word)
+            self.idx2word.pop(self.idx)
+            self.idx -= 1
 
     def __call__(self, word):
         if word not in self.word2idx:
