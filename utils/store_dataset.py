@@ -16,6 +16,7 @@ from vocab import load_vocab
 from vocab import process_text
 
 
+
 def create_answer_mapping(annotations, ans2cat):
     """Returns mapping from question_id to answer.
 
@@ -34,9 +35,13 @@ def create_answer_mapping(annotations, ans2cat):
     for q in annotations['annotations']:
         question_id = q['question_id']
         answer = q['multiple_choice_answer']
-        if answer in ans2cat:
-            answers[question_id] = answer
-            image_ids.add(q['image_id'])
+        for cat in ans2cat:
+            items = ans2cat[cat]
+            for word in items:
+                if answer == word:
+                    answers[question_id] = answer
+                    image_ids.add(q['image_id'])
+                    print answer, q['image_id'] # for logging purposes
     return answers, image_ids
 
 
@@ -103,10 +108,10 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
             continue
         if image_id not in done_img2idx:
             try:
-                path = "%d.jpg" % (image_id)
+                path = "COCO_train2014_%d.jpg" % (image_id)
                 image = Image.open(os.path.join(image_dir, path)).convert('RGB')
             except IOError:
-                path = "%012d.jpg" % (image_id)
+                path = "COCO_train2014_%012d.jpg" % (image_id)
                 image = Image.open(os.path.join(image_dir, path)).convert('RGB')
             image = transform(image)
             d_images[i_index, :, :, :] = np.array(image)
@@ -119,7 +124,14 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
         a, length = process_text(answer, vocab,
                                  max_length=max_a_length)
         d_answers[q_index, :length] = a
-        d_answer_types[q_index] = ans2cat[answer]
+        for item in ans2cat:
+            lsts = ans2cat[item]
+            for word in lsts:
+                if word == answer:
+                    category = item
+                    break
+        c = vocab(category)
+        d_answer_types[q_index] = c
         d_indices[q_index] = done_img2idx[image_id]
         q_index += 1
         bar.update(q_index)
@@ -133,7 +145,7 @@ if __name__ == '__main__':
     parser.add_argument('--image-dir', type=str, default='data/vqa/train2014',
                         help='directory for resized images')
     parser.add_argument('--vocab-path', type=str,
-                        default='data/processed/vocab.json',
+                        default='data/processed/vocab_vae.json',
                         help='Path for saving vocabulary wrapper.')
     parser.add_argument('--questions', type=str,
                         default='data/vqa/v2_OpenEnded_mscoco_'
@@ -144,7 +156,7 @@ if __name__ == '__main__':
                         'train2014_annotations.json',
                         help='Path for train annotation file.')
     parser.add_argument('--ans2cat', type=str,
-                        default='data/processed/ans2cat.json',
+                        default='data/vqa/iq_dataset.json',
                         help='Path for the answer types.')
     parser.add_argument('--output', type=str,
                         default='data/processed/vae_dataset.hdf5',
@@ -156,7 +168,7 @@ if __name__ == '__main__':
     parser.add_argument('--max-a-length', type=int, default=4,
                         help='maximum sequence length for answers.')
     args = parser.parse_args()
-
+    
     save_dataset(args.image_dir, args.questions, args.annotations, args.vocab_path,
                  args.ans2cat, args.output, im_size=args.im_size,
                  max_q_length=args.max_q_length, max_a_length=args.max_a_length)
