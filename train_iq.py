@@ -517,11 +517,9 @@ def train(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+
     # Session parameters.
-    parser.add_argument('--model-type', type=str, default='pg',
-                        help='[ia2q | via2q | iat2q-type | via2q-type | iq | va2q-type]')
-    parser.add_argument('--model-path', type=str,
-                        default='weights/tf1/',
+    parser.add_argument('--model-path', type=str, default='weights/tf1/',
                         help='Path for saving trained models')
     parser.add_argument('--crop-size', type=int, default=224,
                         help='Size for randomly cropping images')
@@ -558,19 +556,19 @@ if __name__ == '__main__':
 
     # Data parameters.
     parser.add_argument('--vocab-path', type=str,
-                        default='data/processed/vocab_vae.json',
+                        default='data/processed/vocab_iq.json',
                         help='Path for vocabulary wrapper.')
     parser.add_argument('--dataset', type=str,
-                        default='data/processed/vae_train_dataset.hdf5',
+                        default='data/processed/iq_dataset.hdf5',
                         help='Path for train annotation json file.')
     parser.add_argument('--val-dataset', type=str,
-                        default='data/processed/vae_val_dataset.hdf5',
+                        default='data/processed/iq_val_dataset.hdf5',
                         help='Path for train annotation json file.')
     parser.add_argument('--train-dataset-weights', type=str,
-                        default='data/processed/vae_train_dataset_weights.json',
+                        default='data/processed/iq_train_dataset_weights.json',
                         help='Location of sampling weights for training set.')
     parser.add_argument('--val-dataset-weights', type=str,
-                        default='data/processed/vae_val_dataset_weights.json',
+                        default='data/processed/iq_val_dataset_weights.json',
                         help='Location of sampling weights for training set.')
     parser.add_argument('--cat2name', type=str,
                         default='data/processed/cat2name.json',

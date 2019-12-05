@@ -37,6 +37,7 @@ source env/bin/activate
 pip install -r requirements.txt
 git submodule init
 git submodule update
+mkdir -p data/processed
 ```
 
 To download the dataset, [visit our website](https://cs.stanford.edu/people/ranjaykrishna/iq/index.html).
@@ -58,6 +59,7 @@ python utils/vocab.py
 
 # Create the hdf5 dataset.
 python utils/store_dataset.py
+python utils/store_dataset.py --output data/processed/iq_val_dataset.hdf5 --questions data/vqa/v2_OpenEnded_mscoco_val2014_questions.json --annotations data/vqa/v2_mscoco_val2014_annotations.json --image-dir data/vqa/val2014
 
 # Train the model.
 python train_iq.py

@@ -151,6 +151,9 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str,
                         default='data/processed/iq_dataset.hdf5',
                         help='directory for resized images.')
+    parser.add_argument('--cat2name', type=str,
+                        default='data/processed/cat2name.json',
+                        help='Location of mapping from category to type name.')
 
     # Hyperparameters.
     parser.add_argument('--im_size', type=int, default=224,
@@ -165,6 +168,8 @@ if __name__ == '__main__':
     with open(args.cat2ans) as f:
         cat2ans = json.load(f)
     cats = sorted(cat2ans.keys())
+    with open(args.cat2name, 'w') as f:
+        json.dump(cats, f)
     for cat in cat2ans:
         for ans in cat2ans[cat]:
             ans2cat[ans] = cats.index(cat)
