@@ -52,7 +52,6 @@ def create_model(args, vocab, embedding=None):
              encoder_max_len=args.encoder_max_len,
              embedding=embedding,
              num_att_layers=args.num_att_layers,
-             use_attention=args.use_attention,
              z_size=args.z_size,
              no_answer_recon=args.no_answer_recon,
              no_image_recon=args.no_image_recon,
@@ -313,20 +312,24 @@ def train(args):
 
     # Build data loader
     logging.info("Building data loader...")
-    train_weights = json.load(open(args.train_dataset_weights))
-    train_weights = torch.DoubleTensor(train_weights)
-    train_sampler = torch.utils.data.sampler.WeightedRandomSampler(
-            train_weights, len(train_weights))
-    val_weights = json.load(open(args.val_dataset_weights))
-    val_weights = torch.DoubleTensor(val_weights)
-    val_sampler = torch.utils.data.sampler.WeightedRandomSampler(
-            val_weights, len(val_weights))
-    data_loader = get_vae_loader(args.dataset, transform,
+    train_sampler = None
+    val_sampler = None
+    if os.path.exists(args.train_dataset_weights):
+        train_weights = json.load(open(args.train_dataset_weights))
+        train_weights = torch.DoubleTensor(train_weights)
+        train_sampler = torch.utils.data.sampler.WeightedRandomSampler(
+                train_weights, len(train_weights))
+    if os.path.exists(args.val_dataset_weights):
+        val_weights = json.load(open(args.val_dataset_weights))
+        val_weights = torch.DoubleTensor(val_weights)
+        val_sampler = torch.utils.data.sampler.WeightedRandomSampler(
+                val_weights, len(val_weights))
+    data_loader = get_loader(args.dataset, transform,
                                  args.batch_size, shuffle=False,
                                  num_workers=args.num_workers,
                                  max_examples=args.max_examples,
                                  sampler=train_sampler)
-    val_data_loader = get_vae_loader(args.val_dataset, transform,
+    val_data_loader = get_loader(args.val_dataset, transform,
                                      args.batch_size, shuffle=False,
                                      num_workers=args.num_workers,
                                      max_examples=args.max_examples,
@@ -602,8 +605,6 @@ if __name__ == '__main__':
                         help='Dropout applied to inputs of the RNN.')
     parser.add_argument('--num-att-layers', type=int, default=2,
                         help='Number of attention layers.')
-    parser.add_argument('--use-attention', action='store_true', default=False,
-                        help='Whether the decoder uses attention.')
     parser.add_argument('--z-size', type=int, default=100,
                         help='Dimensions to use for hidden variational space.')
 

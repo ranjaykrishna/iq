@@ -18,7 +18,7 @@ class IQ(nn.Module):
     def __init__(self, vocab_size, max_len, hidden_size,
                  num_categories, sos_id, eos_id,
                  num_layers=1, rnn_cell='LSTM', bidirectional=False,
-                 input_dropout_p=0, dropout_p=0, use_attention=False,
+                 input_dropout_p=0, dropout_p=0,
                  encoder_max_len=None, num_att_layers=2, att_ff_size=512,
                  embedding=None, z_size=20, no_answer_recon=False,
                  no_image_recon=False, no_category_space=False):
@@ -36,7 +36,6 @@ class IQ(nn.Module):
             bidirectional: Whether the RNN is bidirectional.
             input_dropout_p: Dropout applied to the input question words.
             dropout_p: Dropout applied internally between RNN steps.
-            use_attention: Whether to use attention with decoder.
             encoder_max_len: Maximum length of encoder.
             num_att_layers: Number of stacked attention layers.
             att_ff_size: Dimensions of stacked attention.
@@ -90,7 +89,6 @@ class IQ(nn.Module):
                                   rnn_cell=rnn_cell,
                                   input_dropout_p=input_dropout_p,
                                   dropout_p=dropout_p,
-                                  use_attention=use_attention,
                                   embedding=embedding)
 
         # Setup encodering to z space.
