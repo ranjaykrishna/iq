@@ -130,11 +130,10 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+
+    # Inputs.
     parser.add_argument('--image-dir', type=str, default='data/vqa/train2014',
                         help='directory for resized images')
-    parser.add_argument('--vocab-path', type=str,
-                        default='data/processed/vocab.json',
-                        help='Path for saving vocabulary wrapper.')
     parser.add_argument('--questions', type=str,
                         default='data/vqa/v2_OpenEnded_mscoco_'
                         'train2014_questions.json',
@@ -144,11 +143,18 @@ if __name__ == '__main__':
                         'train2014_annotations.json',
                         help='Path for train annotation file.')
     parser.add_argument('--ans2cat', type=str,
-                        default='data/processed/ans2cat.json',
+                        default='data/processed/iq_dataset.json',
                         help='Path for the answer types.')
+    parser.add_argument('--vocab-path', type=str,
+                        default='data/processed/vocab_iq.json',
+                        help='Path for saving vocabulary wrapper.')
+
+    # Outputs.
     parser.add_argument('--output', type=str,
-                        default='data/processed/vae_dataset.hdf5',
+                        default='data/processed/iq_dataset.hdf5',
                         help='directory for resized images.')
+
+    # Hyperparameters.
     parser.add_argument('--im_size', type=int, default=224,
                         help='Size of images.')
     parser.add_argument('--max-q-length', type=int, default=20,
