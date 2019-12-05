@@ -67,12 +67,12 @@ def tokenize(sentence):
     return tokens
 
 
-def build_vocab(questions, ans2cat, threshold):
+def build_vocab(questions, cat2ans, threshold):
     """Build a vocabulary from the annotations.
 
     Args:
         annotations: A json file containing the questions and answers.
-        ans2cat: A json file containing answer types.
+        cat2ans: A json file containing answer types.
         threshold: The minimum number of times a work must occur. Otherwise it
             is treated as an `Vocabulary.SYM_UNK`.
 
@@ -81,12 +81,12 @@ def build_vocab(questions, ans2cat, threshold):
     """
     with open(questions) as f:
         questions = json.load(f)
-    with open(ans2cat) as f:
-        ans2cat = json.load(f)
+    with open(cat2ans) as f:
+        cat2ans = json.load(f)
 
     words = []
-    for category in ans2cat:
-        for answer in ans2cat[category]:
+    for category in cat2ans:
+        for answer in cat2ans[category]:
             answer = tokenize(answer.encode('utf8'))
             words.extend(answer)
 
@@ -122,7 +122,7 @@ if __name__ == '__main__':
                         default='data/vqa/v2_OpenEnded_mscoco_'
                         'train2014_questions.json',
                         help='Path for train questions file.')
-    parser.add_argument('--ans2cat', type=str,
+    parser.add_argument('--cat2ans', type=str,
                         default='data/vqa/iq_dataset.json',
                         help='Path for the answer types.')
 
@@ -138,7 +138,7 @@ if __name__ == '__main__':
 
     # Configure logging
     logging.basicConfig(level=logging.INFO)
-    vocab = build_vocab(args.questions, args.ans2cat, args.threshold)
+    vocab = build_vocab(args.questions, args.cat2ans, args.threshold)
     logging.info("Total vocabulary size: %d" % len(vocab))
     vocab.save(args.vocab_path)
     logging.info("Saved the vocabulary wrapper to '%s'" % args.vocab_path)

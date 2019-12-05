@@ -63,8 +63,6 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
         annos = json.load(f)
     with open(questions) as f:
         questions = json.load(f)
-    with open(ans2cat) as f:
-        ans2cat = json.load(f)
 
     # Get the mappings from qid to answers.
     qid2ans, image_ids = create_answer_mapping(annos, ans2cat)
@@ -142,8 +140,8 @@ if __name__ == '__main__':
                         default='data/vqa/v2_mscoco_'
                         'train2014_annotations.json',
                         help='Path for train annotation file.')
-    parser.add_argument('--ans2cat', type=str,
-                        default='data/processed/iq_dataset.json',
+    parser.add_argument('--cat2ans', type=str,
+                        default='data/vqa/iq_dataset.json',
                         help='Path for the answer types.')
     parser.add_argument('--vocab-path', type=str,
                         default='data/processed/vocab_iq.json',
@@ -163,8 +161,14 @@ if __name__ == '__main__':
                         help='maximum sequence length for answers.')
     args = parser.parse_args()
 
+    ans2cat = {}
+    with open(args.cat2ans) as f:
+        cat2ans = json.load(f)
+    for cat in cat2ans:
+        for ans in cat2ans[cat]:
+            ans2cat[ans] = cat
     save_dataset(args.image_dir, args.questions, args.annotations, args.vocab_path,
-                 args.ans2cat, args.output, im_size=args.im_size,
+                 ans2cat, args.output, im_size=args.im_size,
                  max_q_length=args.max_q_length, max_a_length=args.max_a_length)
     print('Wrote dataset to %s' % args.output)
     # Hack to avoid import errors.
