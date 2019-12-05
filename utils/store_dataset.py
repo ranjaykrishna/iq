@@ -117,7 +117,7 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
         a, length = process_text(answer, vocab,
                                  max_length=max_a_length)
         d_answers[q_index, :length] = a
-        d_answer_types[q_index] = ans2cat[answer]
+        d_answer_types[q_index] = int(ans2cat[answer])
         d_indices[q_index] = done_img2idx[image_id]
         q_index += 1
         bar.update(q_index)
@@ -164,9 +164,10 @@ if __name__ == '__main__':
     ans2cat = {}
     with open(args.cat2ans) as f:
         cat2ans = json.load(f)
+    cats = sorted(cat2ans.keys())
     for cat in cat2ans:
         for ans in cat2ans[cat]:
-            ans2cat[ans] = cat
+            ans2cat[ans] = cats.index(cat)
     save_dataset(args.image_dir, args.questions, args.annotations, args.vocab_path,
                  ans2cat, args.output, im_size=args.im_size,
                  max_q_length=args.max_q_length, max_a_length=args.max_a_length)
