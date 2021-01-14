@@ -4,3 +4,5 @@ weights/*
 /.vector_cache
 *.zip
 *.pyc
+*.bak
+utils/nlg_eval
