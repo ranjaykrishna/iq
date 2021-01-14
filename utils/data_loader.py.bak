@@ -89,7 +89,7 @@ def collate_fn(data):
     """
     # Sort a data list by caption length (descending order).
     data.sort(key=lambda x: x[5], reverse=True)
-    images, questions, answers, answer_types, qlengths, _ = list(zip(*data))
+    images, questions, answers, answer_types, qlengths, _ = zip(*data)
     images = torch.stack(images, 0)
     questions = torch.stack(questions, 0).long()
     answers = torch.stack(answers, 0).long()

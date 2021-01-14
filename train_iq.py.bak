@@ -203,7 +203,7 @@ def sample_for_each_category(vqg, image, args):
     """
     if args.no_category_space:
         return None
-    categories = torch.LongTensor(list(range(args.num_categories)))
+    categories = torch.LongTensor(range(args.num_categories))
     if torch.cuda.is_available():
         categories = categories.cuda()
     images = image.unsqueeze(0).expand((

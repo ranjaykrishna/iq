@@ -59,13 +59,13 @@ def evaluate(vqg, data_loader, vocab, args, params):
             question = vocab.tokens_to_words(questions[i])
             gts.append(question)
         bar.update(iterations)
-    print('='*80)
-    print('GROUND TRUTH')
-    print(gts[:args.num_show])
-    print('-'*80)
-    print('PREDICTIONS')
-    print(preds[:args.num_show])
-    print('='*80)
+    print '='*80
+    print 'GROUND TRUTH'
+    print gts[:args.num_show]
+    print '-'*80
+    print 'PREDICTIONS'
+    print preds[:args.num_show]
+    print '='*80
     scores = nlge.compute_metrics(ref_list=[gts], hyp_list=preds)
     return scores, gts, preds
 
@@ -147,7 +147,7 @@ def main(args):
     scores, gts, preds = evaluate(vqg, data_loader, vocab, args, params)
 
     # Print and save the scores.
-    print(scores)
+    print scores
     with open(os.path.join(model_dir, args.results_path), 'w') as results_file:
         json.dump(scores, results_file)
     with open(os.path.join(model_dir, args.preds_path), 'w') as preds_file:

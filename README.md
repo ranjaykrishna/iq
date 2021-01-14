@@ -1,3 +1,38 @@
+# BLT-VQG
+## Bottom-Up Latent Transformer Visual Question Generation
+(Not the sandwich 😢)
+
+This repository is heavily based off https://github.com/ranjaykrishna/iq. We (will) make significant modifications to update the codebase to the latest practises.
+
+Changes so far:
+- Updated from Python2 to Python3
+- Modify code to work with latest structure of COCO
+
+Changes to do:
+- Ensure code works with PyTorch 1.7
+- Move away from regex and manual dataloading to HuggingFace dataloaders
+- Implement training through PyTorch lightning
+- Can we remove NLG_eval and use HuggingFace instead?
+
+## Getting up and running (WIP):
+The default directory for data is `data/vqa` and `data/processed`. Refer to IMVQG documentation/README below to find download links for relevant datasets
+
+```
+# Create the vocabulary file.
+python utils/vocab.py
+
+# Create the hdf5 dataset.
+python utils/store_dataset.py
+python utils/store_dataset.py --output data/processed/iq_val_dataset.hdf5 --questions data/vqa/v2_OpenEnded_mscoco_val2014_questions.json --annotations data/vqa/v2_mscoco_val2014_annotations.json --image-dir data/vqa/val2014 --val True
+
+# Train the model.
+python train_iq.py
+
+# Evaluate the model.
+python evaluate_iq.py
+```
+
+
 # Information Maximizing Visual Question Generation
 
 ![IQ model](https://cs.stanford.edu/people/ranjaykrishna/iq/model.png)

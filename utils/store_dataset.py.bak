@@ -42,7 +42,7 @@ def create_answer_mapping(annotations, ans2cat):
 
 def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
                  im_size=224, max_q_length=20, max_a_length=4,
-                 with_answers=False, train_or_val="train"):
+                 with_answers=False):
     """Saves the Visual Genome images and the questions in a hdf5 file.
 
     Args:
@@ -66,10 +66,10 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
 
     # Get the mappings from qid to answers.
     qid2ans, image_ids = create_answer_mapping(annos, ans2cat)
-    total_questions = len(list(qid2ans.keys()))
+    total_questions = len(qid2ans.keys())
     total_images = len(image_ids)
-    print("Number of images to be written: %d" % total_images)
-    print("Number of QAs to be written: %d" % total_questions)
+    print "Number of images to be written: %d" % total_images
+    print "Number of QAs to be written: %d" % total_questions
 
     h5file = h5py.File(output, "w")
     d_questions = h5file.create_dataset(
@@ -89,7 +89,6 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
 
     # Iterate and save all the questions and images.
     bar = progressbar.ProgressBar(maxval=total_questions)
-    bar.start()
     i_index = 0
     q_index = 0
     done_img2idx = {}
@@ -102,10 +101,10 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
             continue
         if image_id not in done_img2idx:
             try:
-                path = "COCO_%s2014_%d.jpg" % (train_or_val, image_id)
+                path = "%d.jpg" % (image_id)
                 image = Image.open(os.path.join(image_dir, path)).convert('RGB')
             except IOError:
-                path = "COCO_%s2014_%012d.jpg" % (train_or_val, image_id)
+                path = "%012d.jpg" % (image_id)
                 image = Image.open(os.path.join(image_dir, path)).convert('RGB')
             image = transform(image)
             d_images[i_index, :, :, :] = np.array(image)
@@ -123,8 +122,8 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
         q_index += 1
         bar.update(q_index)
     h5file.close()
-    print("Number of images written: %d" % i_index)
-    print("Number of QAs written: %d" % q_index)
+    print "Number of images written: %d" % i_index
+    print "Number of QAs written: %d" % q_index
 
 
 if __name__ == '__main__':
@@ -163,9 +162,6 @@ if __name__ == '__main__':
                         help='maximum sequence length for questions.')
     parser.add_argument('--max-a-length', type=int, default=4,
                         help='maximum sequence length for answers.')
-
-    # Train or Val?
-    parser.add_argument('--val', type=bool, default=False, help="whether we're working iwth the validation set or not")
     args = parser.parse_args()
 
     ans2cat = {}
@@ -177,13 +173,9 @@ if __name__ == '__main__':
     for cat in cat2ans:
         for ans in cat2ans[cat]:
             ans2cat[ans] = cats.index(cat)
-    
-    train_or_val = "train"
-    if args.val == True: train_or_val = "val"
-
     save_dataset(args.image_dir, args.questions, args.annotations, args.vocab_path,
                  ans2cat, args.output, im_size=args.im_size,
-                 max_q_length=args.max_q_length, max_a_length=args.max_a_length, train_or_val=train_or_val)
-    print(('Wrote dataset to %s' % args.output))
+                 max_q_length=args.max_q_length, max_a_length=args.max_a_length)
+    print('Wrote dataset to %s' % args.output)
     # Hack to avoid import errors.
     Vocabulary()

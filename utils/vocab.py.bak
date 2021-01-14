@@ -2,7 +2,7 @@
 """
 
 from collections import Counter
-from .train_utils import Vocabulary
+from train_utils import Vocabulary
 
 import argparse
 import json
@@ -63,7 +63,7 @@ def tokenize(sentence):
     sentence = re.sub('\s+', ' ', sentence)
 
     tokens = nltk.tokenize.word_tokenize(
-            sentence.strip().lower())
+            sentence.strip().lower().decode('utf8'))
     return tokens
 
 
@@ -87,12 +87,12 @@ def build_vocab(questions, cat2ans, threshold):
     words = []
     for category in cat2ans:
         for answer in cat2ans[category]:
-            answer = tokenize(answer)
+            answer = tokenize(answer.encode('utf8'))
             words.extend(answer)
 
     counter = Counter()
     for i, entry in enumerate(questions['questions']):
-        question = entry["question"]
+        question = entry["question"].encode('utf8')
         q_tokens = tokenize(question)
         counter.update(q_tokens)
 
@@ -100,7 +100,7 @@ def build_vocab(questions, cat2ans, threshold):
             logging.info("Tokenized %d questions." % (i))
 
     # If a word frequency is less than 'threshold', then the word is discarded.
-    words.extend([word for word, cnt in list(counter.items()) if cnt >= threshold])
+    words.extend([word for word, cnt in counter.items() if cnt >= threshold])
     words = list(set(words))
     vocab = create_vocab(words)
     return vocab

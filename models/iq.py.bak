@@ -124,7 +124,7 @@ class IQ(nn.Module):
 
     def generator_parameters(self):
         params = self.parameters()
-        params = [p for p in params if p.requires_grad]
+        params = filter(lambda p: p.requires_grad, params)
         return params
 
     def info_parameters(self):
@@ -138,7 +138,7 @@ class IQ(nn.Module):
         if self.answer_recon:
             params += list(self.answer_reconstructor.parameters())
 
-        params = [p for p in params if p.requires_grad]
+        params = filter(lambda p: p.requires_grad, params)
         return params
 
     def reparameterize(self, mu, logvar):

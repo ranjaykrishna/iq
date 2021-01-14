@@ -46,15 +46,14 @@ class Vocabulary(object):
             self.idx += 1
 
     def remove_word(self, word):
-	"""Removes a specified word and updates the total number of unique words.
-
-	Args:
-	    word: String representation of the word.
-	"""
-	if word in self.word2idx:
-	    self.word2idx.pop(word)
-	    self.idx2word.pop(self.idx)
-	    self.idx -= 1
+        """Removes a specified word and updates the total number of unique words.
+        Args:
+            word: String representation of the word.
+        """
+        if word in self.word2idx:
+            self.word2idx.pop(word)
+            self.idx2word.pop(self.idx)
+            self.idx -= 1
 
     def __call__(self, word):
         if word not in self.word2idx:
@@ -65,13 +64,13 @@ class Vocabulary(object):
         return len(self.word2idx)
 
     def save(self, location):
-        with open(location, 'wb') as f:
+        with open(location, 'w') as f:
             json.dump({'word2idx': self.word2idx,
                        'idx2word': self.idx2word,
                        'idx': self.idx}, f)
 
     def load(self, location):
-        with open(location, 'rb') as f:
+        with open(location, 'r') as f:
             data = json.load(f)
             self.word2idx = data['word2idx']
             self.idx2word = data['idx2word']
