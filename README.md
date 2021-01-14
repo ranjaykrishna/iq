@@ -7,9 +7,9 @@ This repository is heavily based off https://github.com/ranjaykrishna/iq. We (wi
 Changes so far:
 - Updated from Python2 to Python3
 - Modify code to work with latest structure of COCO
+- Ensure code works with PyTorch 1.7
 
 Changes to do:
-- Ensure code works with PyTorch 1.7
 - Move away from regex and manual dataloading to HuggingFace dataloaders
 - Implement training through PyTorch lightning
 - Can we remove NLG_eval and use HuggingFace instead?
