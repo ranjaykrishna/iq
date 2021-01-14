@@ -11,6 +11,7 @@ Changes so far:
 
 Changes to do:
 - Move away from regex and manual dataloading to HuggingFace dataloaders
+  - Tokenize using BPE as opposed to white space
 - Implement training through PyTorch lightning
 - Can we remove NLG_eval and use HuggingFace instead?
 
