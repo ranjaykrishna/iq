@@ -1,10 +1,21 @@
 """Loads question answering data and feeds it to the models.
 """
 
+import copy
+import json
+import os
+import pickle
 import h5py
 import numpy as np
 import torch
 import torch.utils.data as data
+
+if os.path.exists("vocab.pkl"):
+    vocab = pickle.load(open("vocab.pkl", "rb"))
+else: 
+    import utils.vocab
+    print("Building Vocab")
+    vocab = utils.vocab.build_vocab('data/vqa/v2_OpenEnded_mscoco_train2014_questions.json', 'data/vqa/iq_dataset.json', 4)
 
 
 class IQDataset(data.Dataset):
@@ -28,6 +39,8 @@ class IQDataset(data.Dataset):
         self.max_examples = max_examples
         self.indices = indices
 
+        self.cat2name = sorted(json.load(open("data/processed/cat2name.json", "r")))
+
     def __getitem__(self, index):
         """Returns one data pair (image and caption).
         """
@@ -38,22 +51,50 @@ class IQDataset(data.Dataset):
             self.answer_types = annos['answer_types']
             self.image_indices = annos['image_indices']
             self.images = annos['images']
+            self.image_ids = annos["image_ids"]
 
         if self.indices is not None:
             index = self.indices[index]
+
         question = self.questions[index]
-        answer = self.answers[index]
-        answer_type = self.answer_types[index]
+        
+        posterior = copy.deepcopy(question)
+        posterior[0] = vocab.word2idx[vocab.SYM_POS]
+        posterior = posterior.tolist()
+        try:
+            posterior.remove(vocab.word2idx[vocab.SYM_EOS])        
+            posterior.append(vocab.word2idx[vocab.SYM_PAD])
+        except:
+            pass
+
+        answer = self.answers[index].tolist()
+        try:
+            answer.remove(vocab.word2idx[vocab.SYM_EOS])
+            answer.append(vocab.word2idx[vocab.SYM_PAD])
+        except:
+            answer = answer
+
+        answer_type = self.answer_types[index] # gives us an index of sorted cat2name
+        answer_type = vocab.word2idx[self.cat2name[answer_type]]
+        
+        answer.insert(1, answer_type)
+        answer = np.array(answer)
+        posterior.insert(1, answer_type)
+        posterior = np.array(posterior)
+
         image_index = self.image_indices[index]
         image = self.images[image_index]
+        image_id = self.image_ids[image_index]
 
         question = torch.from_numpy(question)
+
+        posterior = torch.from_numpy(posterior)
         answer = torch.from_numpy(answer)
         alength = answer.size(0) - answer.eq(0).sum(0).squeeze()
         qlength = question.size(0) - question.eq(0).sum(0).squeeze()
         if self.transform is not None:
             image = self.transform(image)
-        return (image, question, answer, answer_type,
+        return (image, image_id, question, posterior, answer, answer_type,
                 qlength.item(), alength.item())
 
     def __len__(self):
@@ -89,14 +130,15 @@ def collate_fn(data):
     """
     # Sort a data list by caption length (descending order).
     data.sort(key=lambda x: x[5], reverse=True)
-    images, questions, answers, answer_types, qlengths, _ = list(zip(*data))
+    images, image_ids, questions, posteriors, answers, answer_types, qlengths, _ = list(zip(*data))
     images = torch.stack(images, 0)
     questions = torch.stack(questions, 0).long()
+    posteriors = torch.stack(posteriors, 0).long()
     answers = torch.stack(answers, 0).long()
     answer_types = torch.Tensor(answer_types).long()
     qindices = np.flip(np.argsort(qlengths), axis=0).copy()
     qindices = torch.Tensor(qindices).long()
-    return images, questions, answers, answer_types, qindices
+    return {"images": images, "image_ids": image_ids, "questions": questions, "posteriors": posteriors, "answers": answers, "answer_types": answer_types, "qindicies": qindices}
 
 
 def get_loader(dataset, transform, batch_size, sampler=None,

@@ -8,14 +8,16 @@ Changes so far:
 - Updated from Python2 to Python3
 - Modify code to work with latest structure of COCO
 - Ensure code works with PyTorch 1.7
+- Implement training through PyTorch lightning
 
-Changes to do:
+Non-model changes to do:
 - Move away from regex and manual dataloading to HuggingFace dataloaders
   - Tokenize using BPE as opposed to white space
-- Implement training through PyTorch lightning
 - Can we remove NLG_eval and use HuggingFace instead?
 
 ## Getting up and running (WIP):
+Download and extract GloVe vectors to the `vectors/` dir. Refer to `train_iq.py` for the set of arguments the model and code will take.
+
 The default directory for data is `data/vqa` and `data/processed`. Refer to IMVQG documentation/README below to find download links for relevant datasets
 
 ```

@@ -6,3 +6,6 @@ weights/*
 *.pyc
 *.bak
 utils/nlg_eval
+vocab.pkl
+lightning_logs/*
+vectors/*

@@ -13,7 +13,7 @@ class EncoderCNN(nn.Module):
         """Load the pretrained ResNet-152 and replace top fc layer.
         """
         super(EncoderCNN, self).__init__()
-        self.cnn = models.resnet18(pretrained=True)
+        self.cnn = models.resnet18(pretrained=True).cuda()
         for param in self.cnn.parameters():
             param.requires_grad = False
         self.cnn.fc = nn.Linear(self.cnn.fc.in_features, output_size)

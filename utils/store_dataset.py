@@ -1,7 +1,9 @@
 """Transform all the IQ VQA dataset into a hdf5 dataset.
 """
 
+import pickle
 from PIL import Image
+from numpy.lib.type_check import imag
 from torchvision import transforms
 
 import argparse
@@ -11,9 +13,9 @@ import numpy as np
 import os
 import progressbar
 
-from train_utils import Vocabulary
-from vocab import load_vocab
-from vocab import process_text
+from utils.train_utils import Vocabulary
+from utils.vocab import build_vocab, load_vocab
+from utils.vocab import process_text
 
 
 def create_answer_mapping(annotations, ans2cat):
@@ -58,7 +60,6 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
         with_answers: Whether to also save the answers.
     """
     # Load the data.
-    vocab = load_vocab(vocab)
     with open(annotations) as f:
         annos = json.load(f)
     with open(questions) as f:
@@ -82,6 +83,9 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
         "answers", (total_questions, max_a_length), dtype='i')
     d_answer_types = h5file.create_dataset(
         "answer_types", (total_questions,), dtype='i')
+    d_image_ids = h5file.create_dataset(
+        "image_ids", (total_questions,), dtype='i')
+    
 
     # Create the transforms we want to apply to every image.
     transform = transforms.Compose([
@@ -105,8 +109,12 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
                 path = "COCO_%s2014_%d.jpg" % (train_or_val, image_id)
                 image = Image.open(os.path.join(image_dir, path)).convert('RGB')
             except IOError:
-                path = "COCO_%s2014_%012d.jpg" % (train_or_val, image_id)
-                image = Image.open(os.path.join(image_dir, path)).convert('RGB')
+                try:
+                    path = "COCO_%s2014_%012d.jpg" % (train_or_val, image_id)
+                    image = Image.open(os.path.join(image_dir, path)).convert('RGB')
+                except:
+                    print("COULD NOT FIND IMAGE {}".format(path))
+                    continue
             image = transform(image)
             d_images[i_index, :, :, :] = np.array(image)
             done_img2idx[image_id] = i_index
@@ -120,6 +128,7 @@ def save_dataset(image_dir, questions, annotations, vocab, ans2cat, output,
         d_answers[q_index, :length] = a
         d_answer_types[q_index] = int(ans2cat[answer])
         d_indices[q_index] = done_img2idx[image_id]
+        d_image_ids[i_index] = image_id
         q_index += 1
         bar.update(q_index)
     h5file.close()
@@ -179,9 +188,19 @@ if __name__ == '__main__':
             ans2cat[ans] = cats.index(cat)
     
     train_or_val = "train"
-    if args.val == True: train_or_val = "val"
+    if args.val == True: 
+        train_or_val = "val"
+        vocab = pickle.load(open("vocab.pkl", "rb"))
+        # vocab.save(args.vocab_path)
+        # vocab = load_vocab(args.vocab_path)
+    else:
+        vocab = build_vocab('data/vqa/v2_OpenEnded_mscoco_train2014_questions.json', 'data/vqa/iq_dataset.json', 4)
+        # vocab = pickle.load(open("vocab.pkl", "rb"))
+        vocab.save(args.vocab_path)
 
-    save_dataset(args.image_dir, args.questions, args.annotations, args.vocab_path,
+
+
+    save_dataset(args.image_dir, args.questions, args.annotations, vocab,
                  ans2cat, args.output, im_size=args.im_size,
                  max_q_length=args.max_q_length, max_a_length=args.max_a_length, train_or_val=train_or_val)
     print(('Wrote dataset to %s' % args.output))

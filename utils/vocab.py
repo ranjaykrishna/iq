@@ -2,7 +2,8 @@
 """
 
 from collections import Counter
-from .train_utils import Vocabulary
+import pickle
+from utils.train_utils import Vocabulary
 
 import argparse
 import json
@@ -79,6 +80,9 @@ def build_vocab(questions, cat2ans, threshold):
     Returns:
         A Vocabulary object.
     """
+
+    print("BUILDING VOCAB FUNCTION")
+
     with open(questions) as f:
         questions = json.load(f)
     with open(cat2ans) as f:
@@ -86,6 +90,8 @@ def build_vocab(questions, cat2ans, threshold):
 
     words = []
     for category in cat2ans:
+        cats = tokenize(category)
+        words.extend(cats)
         for answer in cat2ans[category]:
             answer = tokenize(answer)
             words.extend(answer)
@@ -101,8 +107,9 @@ def build_vocab(questions, cat2ans, threshold):
 
     # If a word frequency is less than 'threshold', then the word is discarded.
     words.extend([word for word, cnt in list(counter.items()) if cnt >= threshold])
-    words = list(set(words))
+    words = list(dict.fromkeys(words))
     vocab = create_vocab(words)
+    pickle.dump(vocab, open("vocab.pkl", "wb"))
     return vocab
 
 
@@ -114,31 +121,33 @@ def create_vocab(words):
     return vocab
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+# if __name__ == '__main__':
+#     parser = argparse.ArgumentParser()
 
-    # Inputs.
-    parser.add_argument('--questions', type=str,
-                        default='data/vqa/v2_OpenEnded_mscoco_'
-                        'train2014_questions.json',
-                        help='Path for train questions file.')
-    parser.add_argument('--cat2ans', type=str,
-                        default='data/vqa/iq_dataset.json',
-                        help='Path for the answer types.')
+#     # Inputs.
+#     parser.add_argument('--questions', type=str,
+#                         default='data/vqa/v2_OpenEnded_mscoco_'
+#                         'train2014_questions.json',
+#                         help='Path for train questions file.')
+#     parser.add_argument('--cat2ans', type=str,
+#                         default='data/vqa/iq_dataset.json',
+#                         help='Path for the answer types.')
 
-    # Hyperparameters.
-    parser.add_argument('--threshold', type=int, default=4,
-                        help='Minimum word count threshold.')
+#     # Hyperparameters.
+#     parser.add_argument('--threshold', type=int, default=4,
+#                         help='Minimum word count threshold.')
 
-    # Outputs.
-    parser.add_argument('--vocab-path', type=str,
-                        default='data/processed/vocab_iq.json',
-                        help='Path for saving vocabulary wrapper.')
-    args = parser.parse_args()
+#     # Outputs.
+#     parser.add_argument('--vocab-path', type=str,
+#                         default='data/processed/vocab_iq.json',
+#                         help='Path for saving vocabulary wrapper.')
+#     args = parser.parse_args()
 
-    # Configure logging
-    logging.basicConfig(level=logging.INFO)
-    vocab = build_vocab(args.questions, args.cat2ans, args.threshold)
-    logging.info("Total vocabulary size: %d" % len(vocab))
-    vocab.save(args.vocab_path)
-    logging.info("Saved the vocabulary wrapper to '%s'" % args.vocab_path)
+#     # Configure logging
+#     logging.basicConfig(level=logging.INFO)
+#     # vocab = build_vocab(args.questions, args.cat2ans, args.threshold)
+#     # logging.info("Total vocabulary size: %d" % len(vocab))
+#     # vocab.save(args.vocab_path)
+#     # logging.info("Saved the vocabulary wrapper to '%s'" % args.vocab_path)
+
+# vocab = build_vocab('data/vqa/v2_OpenEnded_mscoco_train2014_questions.json', 'data/vqa/iq_dataset.json', 4)

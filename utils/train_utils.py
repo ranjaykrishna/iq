@@ -20,6 +20,7 @@ class Vocabulary(object):
     SYM_SOR = '<resp>'   # Start of response.
     SYM_EOS = '<end>'    # End of sentence.
     SYM_UNK = '<unk>'    # Unknown word.
+    SYM_POS = '<pos>'    # Posterior token
 
     def __init__(self):
         """Constructor for Vocabulary.
@@ -33,6 +34,7 @@ class Vocabulary(object):
         self.add_word(self.SYM_SOR)
         self.add_word(self.SYM_EOS)
         self.add_word(self.SYM_UNK)
+        self.add_word(self.SYM_POS)
 
     def add_word(self, word):
         """Adds a new word and updates the total number of unique words.
