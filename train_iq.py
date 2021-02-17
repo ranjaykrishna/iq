@@ -263,6 +263,7 @@ if __name__ == "__main__":
         patience=8,
         verbose=True,
         mode='min',
+        strict=False,
         early_stop_from=args.num_pretraining_steps
     )
 
